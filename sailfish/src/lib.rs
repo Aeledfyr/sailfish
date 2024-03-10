@@ -104,3 +104,38 @@ pub trait Template: private::Sealed {
 pub mod private {
     pub trait Sealed {}
 }
+
+
+impl private::Sealed for () {}
+impl TemplateOnce for () {
+    fn render_once(self) -> runtime::RenderResult {
+        Ok(String::new())
+    }
+    fn render_once_to(self, _buf: &mut runtime::Buffer) -> Result<(), RenderError> {
+        Ok(())
+    }
+}
+
+impl<'a> private::Sealed for &'a str {}
+impl<'a> TemplateOnce for &'a str {
+    fn render_once(self) -> runtime::RenderResult {
+        Ok(self.into())
+    }
+    fn render_once_to(self, buf: &mut runtime::Buffer) -> Result<(), RenderError> {
+        buf.push_str(self);
+        Ok(())
+    }
+}
+
+impl private::Sealed for String {}
+impl TemplateOnce for String {
+    fn render_once(self) -> runtime::RenderResult {
+        Ok(self)
+    }
+    fn render_once_to(self, buf: &mut Buffer) -> Result<(), RenderError> {
+        buf.push_str(&self);
+        Ok(())
+    }
+}
+
+
